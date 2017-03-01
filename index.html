@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- Latest compiled and minified CSS -->
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+			<link rel="stylesheet" href="style.css" media="screen" title="no title" charset="utf-8">
+	</head>
+	<body>
+		<form id="search">
+	        <div class="form-group">
+	            <label for="name">Name</label>
+	            <input type="text" class="form-control" id="name" placeholder="Birdemic">
+	        </div>
+        	<button id="submit" type="submit">Submit</button>
+        	<div id="container"> </div>
+        	<div id="pagination"> </div>
+    	</form>
+		<script>
+
+			/* todo list:
+				- prettify html
+				
+            */
+			var xmlhttp = new XMLHttpRequest();
+        	var url = "";
+        	var api_key = "382652c5762a69290695a528a982a2b9"; 
+        	var posterBaseUrl = "http://image.tmdb.org/t/p/w150";
+        	
+        	var data = {};
+        	/*xmlhttp.withCredentials = true; -> this fail for some reason!?*/
+
+        	var get = function (name, pNum) {
+        		/* httpRequest */
+	            xmlhttp.open("GET", "https://api.themoviedb.org/3/search/movie?api_key="+api_key+"&language=en-US&page="+pNum+"&query="+name, true);
+	            xmlhttp.send();
+
+	            xmlhttp.onreadystatechange = function () {
+	                if (this.readyState == 4 && this.status == 200) {
+	                    /*console.log(JSON.parse(this.responseText)); */
+	                    results(JSON.parse(this.responseText));
+
+	                    /* todo list
+	                    	- maybe use response instead of params
+	                    */
+	                    pagination(name, pNum);
+
+
+	                }
+	                else if (this.readyState == 4 && this.status == 404){
+	                  /* */ 
+	                }
+	                /* */
+	            };
+  
+        	}
+
+        	var results = function(data){
+        		var container = document.getElementById("container");
+
+        		var ul = document.createElement("ul");
+
+        		for (var i = data.results.length - 1; i >= 0; i--) {
+
+        			/* movie list*/
+        			var li = document.createElement("li");
+
+        			/* movie container*/
+        			var movie = document.createElement("div");
+
+        			/* title */
+        			var title = document.createElement("h1");
+        			title.innerHTML = data.results[i].title;
+        			movie.appendChild(title);
+        			
+        			/* poster */
+        			var poster = document.createElement("img");
+        			poster.setAttribute("src", posterBaseUrl + data.results[i].poster_path);
+        			movie.appendChild("poster");
+
+        			li.appendChild(movie);
+
+        			ul.appendChild("li");
+
+        			container.appendChild("ul");
+
+        			/* todo list:
+					- segment li on blocks of 2-3 results per page
+					
+	                */
+
+        			/* end */
+        		};
+
+        	}
+
+        	var pagination = function(name, pNum){
+        		var pag = document.getElementById("pagination");
+
+        		/* next page*/
+                var next = document.createElement('a');
+                next.innerHTML = "next";
+                pag.appendChild(next);
+
+        		/* prev page*/
+        		var prev = document.createElement('a');
+        		prev.innerHTML = "prev";
+                pag.appendChild(prev);
+
+                /* todo list:
+				- make onclick functions 
+				
+                */
+
+        	}
+
+        	var form = document.getElementById("search");
+        	form.onsubmit = function(evt) {
+	            evt.preventDefault();
+
+	            var name = document.getElementById("name");
+	           	
+	            get(name, 1);
+	            name.value = "";
+        	};
+		</script>
+	</body>
+</html>
